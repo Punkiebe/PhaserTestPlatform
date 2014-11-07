@@ -4,9 +4,10 @@
  * and open the template in the editor.
  */
 
-var game = new Phaser.Game(600,480, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(600,480, Phaser.CANVAS, 'gameDiv');
 
 game.state.add('menu', menuState);
 game.state.add('testhowler', testhowlerState);
+game.state.add('testhowler2', testhowler2State);
 
 game.state.start('menu');

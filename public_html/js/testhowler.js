@@ -17,7 +17,8 @@ var testhowlerState = {
 		});
 	},
 	create: function () {
-		game.physics.startSystem(Phaser.Physics.ARCADE);
+		this.backToMenu = game.add.button(game.world.width, 0, 'closebutton', this.backToMenu, this);
+		this.backToMenu.anchor.setTo(1, 0);
 		this.person = game.add.sprite(game.world.centerX, game.world.centerY, 'personCenter');
 		this.person.anchor.setTo(0.5, 0.5);
 		game.physics.arcade.enable(this.person);
@@ -32,8 +33,8 @@ var testhowlerState = {
 		console.log(">> base volume = " + Howler.volume() + " - sound volume : " + this.testNoiseSound.volume());
 	},
 	update: function () {
-		this.volIcon.x = game.input.mousePointer.clientX;
-		this.volIcon.y = game.input.mousePointer.clientY;
+		this.volIcon.x = game.input.mousePointer.x;
+		this.volIcon.y = game.input.mousePointer.y;
 		this.updateSoundBalance(this.person, this.volIcon, this.testNoiseSound);
 		this.updateSoundDistance(this.person, this.volIcon, this.testNoiseSound);
 	},
@@ -41,8 +42,8 @@ var testhowlerState = {
 		this.testNoiseSound.play();
 	},
 	updateSoundBalance: function(source, target, sound) {
-		var posx = ((target.x - source.x) / game.world.width) * 2;
-		var posy = ((target.y - source.y) / game.world.height) * 2;
+		var posx = ((source.x - target.x) / game.world.width) * 2;
+		var posy = ((source.y - target.y) / game.world.height) * 2;
 		// Change the sound position
 		sound.pos3d(posx, posy, -0.5);
 		console.log(sound.pos3d());
@@ -70,5 +71,8 @@ var testhowlerState = {
 	},
 	stopDrag: function() {
 		this.person.body.moves = true;
+	},
+	backToMenu: function() {
+		game.state.start("menu");
 	}
 };

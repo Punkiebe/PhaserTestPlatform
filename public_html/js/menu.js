@@ -7,6 +7,7 @@
 	 preload: function() {
 		 game.load.image('testhowlerbutton', 'assets/img/menu/buttonHowler.png');
 		 game.load.image('testhowler2button', 'assets/img/menu/buttonHowler2.png');
+		 game.load.image('testhowler3button', 'assets/img/menu/buttonHowler3.png');
 		 game.load.image('closebutton', 'assets/img/menu/close.png');
 		 game.physics.startSystem(Phaser.Physics.ARCADE);
 	 },
@@ -16,13 +17,17 @@
 		 this.testhowlerButton.input.useHandCursor = true;
 		 this.testhowlerButton2 = game.add.button(50,150, 'testhowler2button', this.startTestHowler2, this);
 		 this.testhowlerButton2.input.useHandCursor = true;
+		 this.testhowlerButton3 = game.add.button(50,250, 'testhowler3button', this.startTestHowler3, this);
+		 this.testhowlerButton3.input.useHandCursor = true;
 	 },
 	 startTestHowler: function() {
 		 game.state.start('testhowler');
 	 },
 	 startTestHowler2: function() {
 		 game.state.start('testhowler2');
+	 },
+	 startTestHowler3: function() {
+		 game.state.start('testhowler3');
 	 }
-	 
  };
 

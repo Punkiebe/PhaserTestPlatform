@@ -17,8 +17,8 @@ var testhowlerState = {
 		});
 	},
 	create: function () {
-		this.backToMenu = game.add.button(game.world.width, 0, 'closebutton', this.backToMenu, this);
-		this.backToMenu.anchor.setTo(1, 0);
+		this.backToMenuButton = game.add.button(game.world.width, 0, 'closebutton', this.backToMenu, this);
+		this.backToMenuButton.anchor.setTo(1, 0);
 		this.person = game.add.sprite(game.world.centerX, game.world.centerY, 'personCenter');
 		this.person.anchor.setTo(0.5, 0.5);
 		game.physics.arcade.enable(this.person);

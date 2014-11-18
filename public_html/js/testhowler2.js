@@ -12,6 +12,8 @@ var testhowler2State = {
 		});
 	},
 	create: function () {
+		this.backToMenuButton = game.add.button(game.world.width, 0, 'closebutton', this.backToMenu, this);
+		this.backToMenuButton.anchor.setTo(1, 0);
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 		this.soundBox = new Phaser.Rectangle(50, 0, 500, 480);
 		this.soundRec = new Phaser.Rectangle(280, 50, 20, 20);
@@ -27,21 +29,21 @@ var testhowler2State = {
 		this.updateSoundBalance(this.soundRec, this.volIcon, this.testNoiseSound);
 		this.updateSoundDistance(this.soundRec, this.volIcon, this.testNoiseSound, this.soundBox);
 	},
-	render: function() {
-		game.debug.geom(this.soundBox,'rgba(15,255,255,0.5)');
-		game.debug.geom(this.soundRec,'rgba(0,255,0,0.5)');
+	render: function () {
+		game.debug.geom(this.soundBox, 'rgba(15,255,255,0.5)');
+		game.debug.geom(this.soundRec, 'rgba(0,255,0,0.5)');
 		game.debug.inputInfo(32, 20);
 		game.debug.spriteInfo(this.volIcon, 32, 110);
 		game.debug.spriteBounds(this.volIcon);
 	},
-	updateSoundBalance: function(source, target, sound) {
+	updateSoundBalance: function (source, target, sound) {
 		var posx = ((source.x - target.x) / game.world.width) * 2;
 		var posy = ((source.y - target.y) / game.world.height) * 2;
 		// Change the sound position
 		sound.pos3d(posx, posy, -0.5);
 		console.log(sound.pos3d());
 	},
-	updateSoundDistance: function(source, target, sound, soundBox) {
+	updateSoundDistance: function (source, target, sound, soundBox) {
 		console.log("volume : " + sound.volume());
 		if (Phaser.Rectangle.intersects(soundBox, target.getBounds())) {
 			// icon intersects with soundbox
@@ -54,5 +56,8 @@ var testhowler2State = {
 			sound.volume(0.0);
 		}
 		console.log("New volume : " + sound.volume());
+	},
+	backToMenu: function () {
+		game.state.start("menu");
 	}
 };

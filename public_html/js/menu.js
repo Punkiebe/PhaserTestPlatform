@@ -21,6 +21,7 @@
 		 this.testhowlerButton3.input.useHandCursor = true;
 	 },
 	 startTestHowler: function() {
+		 game.state.clearCurrentState();
 		 game.state.start('testhowler');
 	 },
 	 startTestHowler2: function() {

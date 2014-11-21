@@ -8,7 +8,7 @@ var testhowler2State = {
 	preload: function () {
 		game.load.image('volumeIcon', 'assets/img/testhowler/media-volume-2.png');
 		this.testNoiseSound = new Howl({
-			urls: ['assets/audio/testhowler/static_noise_from_tv_with_no_signal.mp3']
+			src: ['assets/audio/testhowler/static_noise_from_tv_with_no_signal.mp3']
 		});
 	},
 	create: function () {
@@ -40,8 +40,8 @@ var testhowler2State = {
 		var posx = ((source.x - target.x) / game.world.width) * 2;
 		var posy = ((source.y - target.y) / game.world.height) * 2;
 		// Change the sound position
-		sound.pos3d(posx, posy, -0.5);
-		console.log(sound.pos3d());
+		sound.pos(posx, posy, -0.5);
+		console.log(sound.pos());
 	},
 	updateSoundDistance: function (source, target, sound, soundBox) {
 		console.log("volume : " + sound.volume());

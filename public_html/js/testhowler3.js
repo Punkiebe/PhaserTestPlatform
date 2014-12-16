@@ -4,6 +4,29 @@
  * and open the template in the editor.
  */
 
+//var SoundBoxSprite = Class.create(Phaser.Sprite, {
+//	initialize : function(game, x, y, key, frame) {
+//		Phaser.Sprite.call(this, game, x, y, key, frame);
+//	},
+//	addSoundSource : function(source) {
+//		this.soundSource = source;
+//	}
+//});
+
+SoundBoxSprite2 = function(name, posX, posY, scaleX, scaleY) {
+	Phaser.Sprite.call(this, game, posX, posY, 'pixelArea');
+	this.scale.set(scaleX, scaleY);
+	this.name = name;
+	this.addSoundSource = function(name, posX, posY, scaleX, scaleY) {
+		this.soundSource = new Phaser.Sprite(game, posX, posY, 'pixelSource');
+		this.soundSource.scale.set(scaleX, scaleY);
+		this.soundSource.name = name;
+	};
+};
+
+SoundBoxSprite2.prototype = Object.create(Phaser.Sprite.prototype);
+SoundBoxSprite2.prototype.constructor = SoundBoxSprite2;
+
 var testhowler3State = {
 	preload: function () {
 		game.load.image('volumeIcon', 'assets/img/testhowler/media-volume-2.png');
@@ -16,36 +39,25 @@ var testhowler3State = {
 	create: function () {
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 		game.world.setBounds(0, 0, 600, 2000); // Sets the size of our world
-		this.box1 = game.add.sprite(50, 0, 'pixelArea');
-		this.box1.scale.set(50, 1000);
-		this.box1.name = "boxArea1";
-		this.source1 = game.add.sprite(65, 980, 'pixelSource');
-		this.source1.scale.set(20, 20);
-		this.source1.name = "boxSource1";
-		this.box2 = game.add.sprite(200, 200, 'pixelArea');
-		this.box2.scale.set(200, 200);
-		this.box2.name = "boxArea2";
-		this.source2 = game.add.sprite(290 , 380, 'pixelSource');
-		this.source2.scale.set(20, 20);
-		this.source2.name = "boxSource2";
-		this.box3 = game.add.sprite(300, 1000, 'pixelArea');
-		this.box3.scale.set(50, 1000);
-		this.box3.name = "boxArea3";
-		this.source3 = game.add.sprite(315, 1980, 'pixelSource');
-		this.source3.scale.set(20, 20);
-		this.source3.name = "boxSource3";
-		//this.box1 = new Phaser.Rectangle(50, 0, 50, 1000);
-		//this.box2 = new Phaser.Rectangle(200, 200, 200, 200);
-		//this.box3 = new Phaser.Rectangle(300, 1000, 50, 1000);
+//		this.soundBox1 = new SoundBoxSprite(game, 50, 0, 'pixelArea');
+		this.soundBox1 = new SoundBoxSprite2("area1", 50, 0, 50, 1000);
+		this.soundBox1.addSoundSource("source1", 65, 980, 20, 20);
+		this.soundBox2 = new SoundBoxSprite2("area2", 200, 200, 200, 200);
+		this.soundBox2.addSoundSource("source2", 290, 380, 20, 20);
+		this.soundBox3 = new SoundBoxSprite2("area3", 300, 1000, 50, 1000);
+		this.soundBox3.addSoundSource("source3", 315, 1980, 20, 20);
 
-		this.boxes = game.add.group();
-		this.boxes.enableBody = true;
-		this.boxes.add(this.box1);
-		this.boxes.add(this.source1);
-		this.boxes.add(this.box2);
-		this.boxes.add(this.source2);
-		this.boxes.add(this.box3);
-		this.boxes.add(this.source3);
+		this.areaBoxes = game.add.group();
+		this.areaBoxes.enableBody = true;
+		this.areaBoxes.add(this.soundBox1);
+		this.areaBoxes.add(this.soundBox2);
+		this.areaBoxes.add(this.soundBox3);
+		
+		this.sourceBoxes = game.add.group();
+		this.sourceBoxes.enableBody = true;
+		this.sourceBoxes.add(this.soundBox1.soundSource);
+		this.sourceBoxes.add(this.soundBox2.soundSource);
+		this.sourceBoxes.add(this.soundBox3.soundSource);
 
 		this.volIcon = game.add.sprite(game.input.mousePointer.clientX, game.input.mousePointer.clientY, 'volumeIcon');
 		this.volIcon.anchor.setTo(0.5, 0.5);
@@ -58,11 +70,15 @@ var testhowler3State = {
 		this.volIcon.x = game.input.mousePointer.x + game.camera.x;
 		this.volIcon.y = game.input.mousePointer.y + game.camera.y;
 
-		var overlap = game.physics.arcade.overlap(this.volIcon, this.boxes, this.soundOverlap, null, this);
+		game.physics.arcade.overlap(this.volIcon, this.sourceBoxes, this.sourceHit, null, this);
+		
+		var overlap = game.physics.arcade.overlap(this.volIcon, this.areaBoxes, this.soundOverlap, null, this);
 
 		if (!overlap) {
-			this.testNoiseSound.pause();
+			this.testNoiseSound.stop();
 		}
+		console.log(">> z index : " + this.soundBox1.z + " - " + this.soundBox1.soundSource.z);
+		console.log(">> z renderid : " + this.soundBox1.renderOrderID + " - " + this.soundBox1.soundSource.renderOrderID);
 
 		// move the world
 		game.camera.y += 1;
@@ -74,8 +90,17 @@ var testhowler3State = {
 	},
 	soundOverlap: function (icon, box) {
 		console.log("overlap " + icon.name + " - " + box.name);
-		this.soundId = this.testNoiseSound.play();
-		console.log("sound id : " + this.soundId);
+		if (!this.soundId) {
+			this.soundId = this.testNoiseSound.play();
+		} else {
+			//if (!this.testNoiseSound.playing(this.soundId)) {
+				this.testNoiseSound.play(this.soundId);
+			//}
+		}
+		console.log("sound id : " + this.soundId + " - " + this.testNoiseSound.playing(this.soundId));
+	},
+	sourceHit: function(icon, source) {
+		alert('got hit by ' + source.name);
 	},
 	updateSoundBalance: function (source, target, sound) {
 		var posx = ((source.x - target.x) / game.world.width) * 2;

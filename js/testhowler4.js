@@ -25,6 +25,7 @@ var testhowler4State = {
 		game.load.image('volumeIcon', 'assets/img/testhowler/media-volume-2.png');
 		game.load.image('pixelArea', 'assets/img/testhowler3/onewhitepixel.png');
 		game.load.image('pixelSource', 'assets/img/testhowler3/oneredpixel.png');
+		game.load.image('pixelPlayer', 'assets/img/testhowler3/onegreenpixel.png');
 		this.testNoiseSound = new Howl({
 			src: ['assets/audio/testhowler/static_noise_from_tv_with_no_signal.mp3']
 		});
@@ -50,22 +51,28 @@ var testhowler4State = {
 		this.sourceBoxes.add(this.soundBox1.soundSource);
 		this.sourceBoxes.add(this.soundBox2.soundSource);
 		this.sourceBoxes.add(this.soundBox3.soundSource);
-		
+
 		this.endBar = game.add.sprite(0, 1300, 'pixelSource');
 		this.endBar.scale.setTo(600, 20);
 		game.physics.arcade.enableBody(this.endBar);
+
+		/*var text = game.add.text(game.camera.view.centerX, game.camera.view.centerY, "Click to start.", {font: "40px Arial", fill: "#ff00FF", align: "center"});
+		text.anchor.setTo(0.5, 0.5);*/
 
 		this.volIcon = game.add.sprite(game.input.mousePointer.clientX, game.input.mousePointer.clientY, 'volumeIcon');
 		this.volIcon.anchor.setTo(0.5, 0.5);
 		this.volIcon.name = "icon";
 		game.physics.arcade.enableBody(this.volIcon);
+		this.paused = false;
 	},
 	update: function () {
 		this.volIcon.x = game.input.mousePointer.x + game.camera.x;
 		this.volIcon.y = game.input.mousePointer.y + game.camera.y;
-
-		game.physics.arcade.overlap(this.volIcon, this.sourceBoxes, this.sourceHit, null, this);
-		game.physics.arcade.overlap(this.volIcon, this.endBar, this.endGame, null, this);
+        var endOverlap = false;
+		endOverlap = game.physics.arcade.overlap(this.volIcon, this.sourceBoxes, this.sourceHit, null, this);
+        if (!endOverlap) {
+		  endOverlap = game.physics.arcade.overlap(this.volIcon, this.endBar, this.endGame, null, this);
+        }
 
 		var overlap = game.physics.arcade.overlap(this.volIcon, this.areaBoxes, this.soundOverlap, null, this);
 
@@ -74,7 +81,9 @@ var testhowler4State = {
 			console.log("No overlap");
 			this.soundId = null;
 		}
-		game.camera.y += 2;
+		if (!endOverlap || !this.paused) {
+			game.camera.y += 2;
+		}
 	},
 	render: function () {
 		//	render phase
@@ -94,10 +103,28 @@ var testhowler4State = {
 		this.updateSoundDistance(box.soundSource, icon, this.testNoiseSound, box);
 	},
 	sourceHit: function (icon, source) {
-		alert('got hit by ' + source.name);
+		var text = "Lost!! Got hit by " + source.name;
+		var style = {font: "10px Arial", fill: "#ff00FF", align: "center"};
+
+        if (!this.paused)  {
+            console.info("source HIT log");
+            var t = game.add.text(game.camera.view.centerX, game.camera.view.centerY, text, style);
+            t.anchor.setTo(0.5, 0.5);
+            game.time.events.add(1000, this.returnToMenu, this);
+        }
+		this.paused = true;
 	},
 	endGame: function (icon, source) {
-		alert('Won!!  ' + source.name);
+		var text = "Won!!";
+		var style = {font: "30px Arial", fill: "#ff00FF", align: "center"};
+
+		var t = game.add.text(game.camera.view.centerX, game.camera.view.centerY, text, style);
+		t.anchor.setTo(0.5, 0.5);
+		game.time.events.add(1000, this.returnToMenu, this);
+		this.paused = true;
+	},
+	returnToMenu: function () {
+		game.state.start('menu');
 	},
 	updateSoundBalance: function (source, target, sound) {
 		var posx = ((source.x - target.x) / game.world.width) * 2;

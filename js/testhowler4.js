@@ -93,30 +93,33 @@ var testhowler4State = {
 		if (!this.soundId) {
 			this.soundId = this.testNoiseSound.play();
 		} else {
-			if (!this.testNoiseSound.playing(this.soundId)) {
+			if (!this.testNoiseSound.playing(this.soundId) && !this.paused) {
+                console.log("start play ");
 				this.testNoiseSound.play(this.soundId);
 			}
 		}
 		console.log("sound id : " + this.soundId + " - " + this.testNoiseSound.playing(this.soundId));
 
-		this.updateSoundBalance(box.soundSource, icon, this.testNoiseSound);
-		this.updateSoundDistance(box.soundSource, icon, this.testNoiseSound, box);
+        if (!this.paused) {
+            this.updateSoundBalance(box.soundSource, icon, this.testNoiseSound);
+            this.updateSoundDistance(box.soundSource, icon, this.testNoiseSound, box);
+        }
 	},
 	sourceHit: function (icon, source) {
-		var text = "Lost!! Got hit by " + source.name;
-		var style = {font: "10px Arial", fill: "#ff00FF", align: "center"};
-
         if (!this.paused)  {
+            var text = "Lost!! Got hit by " + source.name;
+            var style = {font: "50px Arial", fill: "#ff00FF", align: "center"};
             console.info("source HIT log");
             var t = game.add.text(game.camera.view.centerX, game.camera.view.centerY, text, style);
             t.anchor.setTo(0.5, 0.5);
             game.time.events.add(1000, this.returnToMenu, this);
+            this.testNoiseSound.stop();
+            this.paused = true;
         }
-		this.paused = true;
 	},
 	endGame: function (icon, source) {
 		var text = "Won!!";
-		var style = {font: "30px Arial", fill: "#ff00FF", align: "center"};
+		var style = {font: "50px Arial", fill: "#ff00FF", align: "center"};
 
 		var t = game.add.text(game.camera.view.centerX, game.camera.view.centerY, text, style);
 		t.anchor.setTo(0.5, 0.5);
@@ -124,6 +127,7 @@ var testhowler4State = {
 		this.paused = true;
 	},
 	returnToMenu: function () {
+        this.testNoiseSound.stop();
 		game.state.start('menu');
 	},
 	updateSoundBalance: function (source, target, sound) {

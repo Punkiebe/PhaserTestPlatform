@@ -1,8 +1,3 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 SoundBoxSprite = function (name, posX, posY, scaleX, scaleY) {
 	Phaser.Sprite.call(this, game, posX, posY, 'pixelArea');
@@ -59,22 +54,36 @@ var testhowler4State = {
 		/*var text = game.add.text(game.camera.view.centerX, game.camera.view.centerY, "Click to start.", {font: "40px Arial", fill: "#ff00FF", align: "center"});
 		text.anchor.setTo(0.5, 0.5);*/
 
-		this.volIcon = game.add.sprite(game.input.mousePointer.clientX, game.input.mousePointer.clientY, 'volumeIcon');
+        this.player = game.add.sprite(300, 50, 'pixelPlayer');
+        this.player.anchor.setTo(0.5,0.5);
+        this.player.scale.setTo(40, 40);
+        game.physics.arcade.enableBody(this.player);
+        this.player.body.collideWorldBounds = true;
+        this.player.inputEnabled = true;
+        this.player.input.enableDrag(true, true);
+        this.player.input.consumePointerEvent = true;
+        //this.player.input.onDown.add(this.playerClicked, this);
+
+        this.player.events.onInputDown.add(this.playerClickedOn, this);
+        this.player.events.onInputUp.add(this.playerClickedOff, this);
+        this.playerfollow = false;
+
+	/*	this.volIcon = game.add.sprite(game.input.mousePointer.clientX, game.input.mousePointer.clientY, 'volumeIcon');
 		this.volIcon.anchor.setTo(0.5, 0.5);
 		this.volIcon.name = "icon";
-		game.physics.arcade.enableBody(this.volIcon);
+		game.physics.arcade.enableBody(this.volIcon);*/
 		this.paused = false;
 	},
 	update: function () {
-		this.volIcon.x = game.input.mousePointer.x + game.camera.x;
-		this.volIcon.y = game.input.mousePointer.y + game.camera.y;
+		/*this.volIcon.x = game.input.mousePointer.x + game.camera.x;
+		this.volIcon.y = game.input.mousePointer.y + game.camera.y;*/
         var endOverlap = false;
-		endOverlap = game.physics.arcade.overlap(this.volIcon, this.sourceBoxes, this.sourceHit, null, this);
+		endOverlap = game.physics.arcade.overlap(this.player, this.sourceBoxes, this.sourceHit, null, this);
         if (!endOverlap) {
-		  endOverlap = game.physics.arcade.overlap(this.volIcon, this.endBar, this.endGame, null, this);
+		  endOverlap = game.physics.arcade.overlap(this.player, this.endBar, this.endGame, null, this);
         }
 
-		var overlap = game.physics.arcade.overlap(this.volIcon, this.areaBoxes, this.soundOverlap, null, this);
+		var overlap = game.physics.arcade.overlap(this.player, this.areaBoxes, this.soundOverlap, null, this);
 
 		if (!overlap) {
 			this.testNoiseSound.stop();
@@ -82,12 +91,29 @@ var testhowler4State = {
 			this.soundId = null;
 		}
 		if (!endOverlap || !this.paused) {
-			game.camera.y += 2;
+			game.camera.y += 1;
 		}
+
+        if (this.playerfollow) {
+            this.player.x = game.input.mousePointer.x + game.camera.x;
+            this.player.y = game.input.mousePointer.y + game.camera.y;
+        } else if (!this.player.inCamera) {
+            // player no longer in camera move inside camera
+            console.log("OUT OF CAMERA, MOVE!!");
+            this.player.y = game.camera.y + 40;
+        }
 	},
 	render: function () {
 		//	render phase
+        game.debug.spriteInfo(this.player, 10, 10);
 	},
+    playerClickedOn: function() {
+        console.log("mouse down on player");
+        this.playerfollow = true;
+    }, playerClickedOff: function() {
+        console.log("mouse up on player");
+        this.playerfollow = false;
+    },
 	soundOverlap: function (icon, box) {
 		console.log("overlap " + icon.name + " - " + box.name);
 		if (!this.soundId) {
@@ -98,7 +124,6 @@ var testhowler4State = {
 				this.testNoiseSound.play(this.soundId);
 			}
 		}
-		console.log("sound id : " + this.soundId + " - " + this.testNoiseSound.playing(this.soundId));
 
         if (!this.paused) {
             this.updateSoundBalance(box.soundSource, icon, this.testNoiseSound);
@@ -133,14 +158,12 @@ var testhowler4State = {
 	updateSoundBalance: function (source, target, sound) {
 		var posx = ((source.x - target.x) / game.world.width) * 2;
 		var posy = ((source.y - target.y) / game.world.height) * 2;
-		console.log("posx = " + posx + " - posy = " + posy);
 		// Change the sound position
 		sound.pos(posx, posy, -0.5, this.soundId);
 	},
 	updateSoundDistance: function (source, target, sound, soundBox) {
 		var distance = game.physics.arcade.distanceBetween(source, target);
 		var soundMaxDistance = Math.sqrt(Math.pow(soundBox.height, 2) + Math.pow(soundBox.width, 2));
-		console.log("Sound box max distance : " + soundMaxDistance);
 		var vol = (soundMaxDistance - distance) / soundMaxDistance;
 		sound.volume(vol, this.soundId);
 	}

@@ -1,8 +1,3 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 //var SoundBoxSprite = Class.create(Phaser.Sprite, {
 //	initialize : function(game, x, y, key, frame) {

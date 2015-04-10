@@ -27,7 +27,7 @@ var testhowler4State = {
 	},
 	create: function () {
 		game.physics.startSystem(Phaser.Physics.ARCADE);
-		game.world.setBounds(0, 0, 600, 1600); // Sets the size of our world
+		game.world.setBounds(0, 0, 600, 1800); // Sets the size of our world
 		this.soundBox1 = new SoundBoxSprite("area1", 100, 500, 200, 500);
 		this.soundBox1.addSoundSource("source1", 100, 740, 200, 20);
 		this.soundBox2 = new SoundBoxSprite("area2", 500, 500, 200, 500);
@@ -60,8 +60,8 @@ var testhowler4State = {
         game.physics.arcade.enableBody(this.player);
         this.player.body.collideWorldBounds = true;
         this.player.inputEnabled = true;
-        this.player.input.enableDrag(true, true);
-        this.player.input.consumePointerEvent = true;
+       // this.player.input.enableDrag(true, true);
+        // this.player.input.consumePointerEvent = true;
         //this.player.input.onDown.add(this.playerClicked, this);
 
         this.player.events.onInputDown.add(this.playerClickedOn, this);
@@ -90,18 +90,19 @@ var testhowler4State = {
 			console.log("No overlap");
 			this.soundId = null;
 		}
-		if (!endOverlap || !this.paused) {
-			game.camera.y += 1;
-		}
 
         if (this.playerfollow) {
             this.player.x = game.input.mousePointer.x + game.camera.x;
             this.player.y = game.input.mousePointer.y + game.camera.y;
-        } else if (!this.player.inCamera) {
+        } else if (this.player.y - 20 < game.camera.y + 5) {
             // player no longer in camera move inside camera
             console.log("OUT OF CAMERA, MOVE!!");
-            this.player.y = game.camera.y + 40;
+            this.player.y = game.camera.y + 5 + 20;
         }
+
+		if (!endOverlap || !this.paused) {
+			game.camera.y += 1;
+		}
 	},
 	render: function () {
 		//	render phase
@@ -110,7 +111,8 @@ var testhowler4State = {
     playerClickedOn: function() {
         console.log("mouse down on player");
         this.playerfollow = true;
-    }, playerClickedOff: function() {
+    },
+    playerClickedOff: function() {
         console.log("mouse up on player");
         this.playerfollow = false;
     },
@@ -133,7 +135,7 @@ var testhowler4State = {
 	sourceHit: function (icon, source) {
         if (!this.paused)  {
             var text = "Lost!! Got hit by " + source.name;
-            var style = {font: "50px Arial", fill: "#ff00FF", align: "center"};
+            var style = {font: "50px Arial", fill: "#ff0000", align: "center"};
             console.info("source HIT log");
             var t = game.add.text(game.camera.view.centerX, game.camera.view.centerY, text, style);
             t.anchor.setTo(0.5, 0.5);
@@ -144,7 +146,7 @@ var testhowler4State = {
 	},
 	endGame: function (icon, source) {
 		var text = "Won!!";
-		var style = {font: "50px Arial", fill: "#ff00FF", align: "center"};
+		var style = {font: "50px Arial", fill: "#00ff00", align: "center"};
 
 		var t = game.add.text(game.camera.view.centerX, game.camera.view.centerY, text, style);
 		t.anchor.setTo(0.5, 0.5);

@@ -101,7 +101,7 @@ var testhowler4State = {
         }
 
 		if (!endOverlap || !this.paused) {
-			game.camera.y += 1;
+			game.camera.y += 3;
 		}
 	},
 	render: function () {
